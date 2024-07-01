@@ -7,22 +7,19 @@ import { PrismaClient } from "@prisma/client";
 })();
 
 async function main() {
-  // await MongoDatabase.connect({
-  //   mongoUrl: envs.MONGO_URL,
-  //   dbName: envs.MONGO_DB_NAME,
-  // });
-
-  const prisma = new PrismaClient();
-  const newLog = await prisma.logModel.create({
-    data: {
-      level: "HIGH",
-      message: "Test Prisma Log",
-      origin: "App.ts",
-    },
+  await MongoDatabase.connect({
+    mongoUrl: envs.MONGO_URL,
+    dbName: envs.MONGO_DB_NAME,
   });
 
-  const logs = await prisma.logModel.findMany();
-  console.log(logs);
+  // const prisma = new PrismaClient();
+  // const newLog = await prisma.logModel.create({
+  //   data: {
+  //     level: "HIGH",
+  //     message: "Test Prisma Log",
+  //     origin: "App.ts",
+  //   },
+  // });
 
-  // Server.start();
+  Server.start();
 }

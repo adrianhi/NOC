@@ -1,15 +1,16 @@
-import { envs } from "../config/plugins/envs.plugin";
-import { CheckService } from "../domain/use-cases/checks/check-service";
-import { SendEmailLogs } from "../domain/use-cases/email/send-email-logs";
+import { CheckServiceMultiple } from "../domain/use-cases/checks/check-service-multiple";
 import { FileSystemDatasource } from "../infrastructure/datasource/file-system.datasource";
 import { MongoLogDatasource } from "../infrastructure/datasource/mongo-log.datasource";
+import { PostgresLogDatasource } from "../infrastructure/datasource/postgres-log.datasource";
 import { LogRepositoryImpl } from "../infrastructure/repositories/log.repository.impl";
 import { CronService } from "./cron/cron-service";
 import { EmailService } from "./email/email.service";
-const logRepository = new LogRepositoryImpl(
-  // new FileSystemDatasource()
-  new MongoLogDatasource()
+const fslogRepository = new LogRepositoryImpl(new FileSystemDatasource());
+const mongologRepository = new LogRepositoryImpl(new MongoLogDatasource());
+const postgreslogRepository = new LogRepositoryImpl(
+  new PostgresLogDatasource()
 );
+
 const emailService = new EmailService();
 export class Server {
   public static start() {
@@ -21,8 +22,8 @@ export class Server {
     // ]);
 
     CronService.createJob("*/5 * * * * *", () => {
-      new CheckService(
-        logRepository,
+      new CheckServiceMultiple(
+        [fslogRepository, mongologRepository, postgreslogRepository],
         () => console.log("success"),
         () => console.log("error")
       ).execute("https://www.google.com/");
